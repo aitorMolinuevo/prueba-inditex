@@ -1,0 +1,103 @@
+openapi: 3.0.1
+info:
+  title: Price Service API
+  description: API for retrieving applicable prices for Inditex products.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+paths:
+  /prices:
+    get:
+      summary: Get applicable price
+      description: Returns the applicable price for a given product and brand at a specific date.
+      tags:
+        - Price
+      operationId: getApplicablePrice
+      parameters:
+        - name: applicationDate
+          in: query
+          description: The date and time to check the price for
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: productId
+          in: query
+          description: The product identifier
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: brandId
+          in: query
+          description: The brand identifier (e.g., 1 for ZARA)
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceResponse'
+        '400':
+          description: Bad Request - Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Not Found - No price found for the given criteria
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+
+components:
+  schemas:
+    PriceResponse:
+      type: object
+      properties:
+        productId:
+          type: integer
+          format: int64
+        brandId:
+          type: integer
+          format: int32
+        priceList:
+          type: integer
+          format: int32
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        price:
+          type: number
+          format: double
+          description: Final price to apply
+
+    ApiError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int32
+        error:
+          type: string
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        path:
+          type: string
